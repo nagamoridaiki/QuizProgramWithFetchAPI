@@ -14,7 +14,7 @@ let numberOfCorrectAnswers = 0;
 let questionNumber = 0;
 const ALL_QUIZ_COUNT = 10;//出題問題数
 
-
+//選択肢をシャッフルするため
 const shuffle = ([...array]) => {
     for (let i = array.length - 1; i >= 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -23,6 +23,7 @@ const shuffle = ([...array]) => {
     return array;
   }
 
+//開始ボタン押下時の処理
 button.addEventListener('click', function(e){
     url = "https://opentdb.com/api.php?amount=10";
     let results = Array();
@@ -31,22 +32,21 @@ button.addEventListener('click', function(e){
     question.innerHTML = '少々お待ちください';
     button.style.visibility = "hidden"
 
+    //問題データを取得
     fetch(url)
     .then(response => response.json())
     .then(data => {
         results = data.results;
-        for (let i = 0 ; i < results.length ; i++) {
-            questionArray.push(results[i]['question']);
-            correctAnswerArray.push(results[i]['correct_answer']);
-            incorrectAnswerArray.push(results[i]['incorrect_answers']);
-            categories.push(results[i]['category']);
-            difficulties.push(results[i]['difficulty']);
-        }
-        //console.log("questionArray", questionArray);
+        //各配列に格納する。
+        results.forEach(function (result) {
+            questionArray.push(result['question']);
+            correctAnswerArray.push(result['correct_answer']);
+            incorrectAnswerArray.push(result['incorrect_answers']);
+            categories.push(result['category']);
+            difficulties.push(result['difficulty']);
+        })
+        //Consoleで答えを確認したい時のために
         console.log("correctAnswerArray", correctAnswerArray);
-        console.log("incorrectAnswerArray", incorrectAnswerArray);
-        //console.log("categories", categories);
-        //console.log("difficulties", difficulties);
 
         showQuiz();//クイズを画面に表示
     })
@@ -67,14 +67,15 @@ function showQuiz () {
     '<h4>' + '[難易度] ' + difficulties[questionNumber] + '</h4>'
     question.innerHTML = questionArray[questionNumber];
 
-    //正解と不正解の選択肢を配列choicesに格納する
+    //正解と不正解の選択肢を１つの配列に一緒に格納する。
     choices.push(correctAnswerArray[questionNumber]);
     incorrectAnswerArray[questionNumber].forEach(function (incorrectAnswer) {
         choices.push(incorrectAnswer);
     });
-
-    //choicesの順をランダムにしてそれぞれの選択肢ボタンをつくる。
+    //選択肢の順番をシャッフル
     shuffleCoices = shuffle(choices);
+
+    //それぞれの選択肢ボタンをつくる。
     shuffleCoices.forEach(function (one_choice) {
         const tr = document.createElement("tr");
         tr.innerHTML = '<td>' + '<button class=answer>' + one_choice + '</button>' + '</td>';
@@ -83,8 +84,7 @@ function showQuiz () {
 
     answerBtn = document.getElementsByClassName('answer')
     for (let n = 0 ; n < answerBtn.length ; n++) {
-        answerBtn[n].setAttribute('id', n)
-        answerBtn[n].setAttribute("onclick", "select("+n+")");
+        answerBtn[n].setAttribute("onclick", "select("+n+")");//setAtributeのidで実装できなかった
     };
 }
 
@@ -93,9 +93,9 @@ function select (n) {
     //選択が正解ならば
     if (shuffleCoices[n] === correctAnswerArray[questionNumber]) {
         numberOfCorrectAnswers += 1;
-        console.log("正解")
+        console.log("正解")//確認用
     }else{
-        console.log("不正解")
+        console.log("不正解")//確認用
     }
     choices = [];//選択肢を空にする
     questionNumber += 1;//問題を次のステップの番号に
@@ -105,6 +105,7 @@ function select (n) {
     questionNumber === ALL_QUIZ_COUNT ? resultShow() : showQuiz ();
 };
 
+//結果発表の画面レンダリング
 function resultShow () {
     title.innerHTML = 'あなたの正答数は' + numberOfCorrectAnswers + 'です！！';
     question.innerHTML = '再度チャレンジしたい場合は以下をクリック！！';
