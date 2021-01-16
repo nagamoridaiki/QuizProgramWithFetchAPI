@@ -1,14 +1,15 @@
 const button = document.getElementById('button')
 title = document.getElementById('title');
 question = document.getElementById('question');
-list = document.getElementById('list');
+choicesList = document.getElementById('choicesList');
 generate = document.getElementById('generate');
+const url = "https://opentdb.com/api.php?amount=10";
 let categories = [];
 let difficulties = [];
 let questionArray = [];
 let correctAnswerArray = [];
 let incorrectAnswerArray = [];
-let shuffleCoices = [];
+let shuffleChoices = [];
 let choices = [];
 let numberOfCorrectAnswers = 0;
 let questionNumber = 0;
@@ -25,8 +26,6 @@ const shuffle = ([...array]) => {
 
 //開始ボタン押下時の処理
 button.addEventListener('click', function(e){
-    url = "https://opentdb.com/api.php?amount=10";
-    let results = Array();
     //通信中の処理
     title.innerHTML = '取得中';
     question.innerHTML = '少々お待ちください';
@@ -73,13 +72,13 @@ function showQuiz () {
         choices.push(incorrectAnswer);
     });
     //選択肢の順番をシャッフル
-    shuffleCoices = shuffle(choices);
+    shuffleChoices = shuffle(choices);
 
     //それぞれの選択肢ボタンをつくる。
-    shuffleCoices.forEach(function (one_choice) {
+    shuffleChoices.forEach(function (one_choice) {
         const tr = document.createElement("tr");
         tr.innerHTML = '<td>' + '<button class=answer>' + one_choice + '</button>' + '</td>';
-        list.appendChild(tr);
+        choicesList.appendChild(tr);
     })
 
     answerBtn = document.getElementsByClassName('answer')
@@ -91,7 +90,7 @@ function showQuiz () {
 //選択肢にアンサーしたとき
 function select (n) {
     //選択が正解ならば
-    if (shuffleCoices[n] === correctAnswerArray[questionNumber]) {
+    if (shuffleChoices[n] === correctAnswerArray[questionNumber]) {
         numberOfCorrectAnswers += 1;
         console.log("正解")//確認用
     }else{
@@ -99,7 +98,7 @@ function select (n) {
     }
     choices = [];//選択肢を空にする
     questionNumber += 1;//問題を次のステップの番号に
-    list.innerHTML = "";//選択肢のレンダリングを空にする
+    choicesList.innerHTML = "";//選択肢のレンダリングを空にする
 
     //問題番号が出題数を満たした場合、結果発表へ
     questionNumber === ALL_QUIZ_COUNT ? resultShow() : showQuiz ();
@@ -112,7 +111,7 @@ function resultShow () {
     generate.innerHTML = '';
     const btn = document.createElement("button");
     btn.innerHTML =   'ホームに戻る' ;
-    list.appendChild(btn);
+    choicesList.appendChild(btn);
     
     btn.addEventListener('click', function(e){
         //はじめからやりなおす(リロード)
