@@ -25,19 +25,17 @@ const shuffle = ([...array]) => {
   }
 
 //開始ボタン押下時の処理
-button.addEventListener('click', function(e){
+button.addEventListener('click', async () => {
     //通信中の処理
     title.innerHTML = '取得中';
     question.innerHTML = '少々お待ちください';
     button.style.visibility = "hidden"
 
     //問題データを取得
-    fetch(url)
-    .then(response => response.json())
-    .then(data => {
-        results = data.results;
-        //各配列に格納する。
-        results.forEach(function (result) {
+    try {
+        const response = await fetch(url);
+        const json = await response.json();
+        json.results.forEach((result) => {
             questionArray.push(result['question']);
             correctAnswerArray.push(result['correct_answer']);
             incorrectAnswerArray.push(result['incorrect_answers']);
@@ -46,14 +44,12 @@ button.addEventListener('click', function(e){
         })
         //Consoleで答えを確認したい時のために
         console.log("correctAnswerArray", correctAnswerArray);
-
+        
         showQuiz();//クイズを画面に表示
-    })
-    .catch((error) => {
-        console.error('Error:', error);
-        alert(error); 
-    });
-
+    } catch (e) {
+        console.error('Error:', e);
+        alert(e);
+    }
 })
 
 //クイズを画面に表示
